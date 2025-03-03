@@ -1,0 +1,175 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Business {
+    //variables
+    private String name;
+    private String owner;
+    private double funds;
+
+    //Static field to track total businesses
+    private static int totalBusinesses = 0;
+
+    //Static constant for tax rate
+    public static final double TAX_RATE = 0.1;
+
+    //Composition: List of employees
+    private List<Employee> employees;
+
+    //Overloaded constructors
+    public Business(String name) {
+        this(name, "Unknown Owner", 0.0);
+    }
+
+    public Business(String name, double startingFunds) {
+        this(name, "Unknown Owner", startingFunds);
+    }
+
+    public Business(String name, String owner, double startingFunds) {
+        this.name = name;
+        this.owner = owner;
+        this.funds = startingFunds;
+        this.employees = new ArrayList<>();
+        totalBusinesses++;
+    }
+
+    //Method to pay taxes
+    public void payTaxes() {
+        double taxAmount = funds * TAX_RATE;
+        funds -= taxAmount;
+        System.out.printf("Taxes paid: $%.2f | Remaining funds: $%.2f%n", taxAmount, funds);
+    }
+
+    //Method to hire an employee
+    public void hireEmployee(String name, String role, double salary) {
+        Employee newEmployee = new Employee(name, role, salary);
+        employees.add(newEmployee);
+        System.out.printf("Hired %s as a %s with a salary of $%.2f/hour.%n", name, role, salary);
+    }
+
+    //Method to pay salaries to all employees
+    public void paySalaries() {
+        double totalSalaries = 0;
+        for (Employee employee : employees) {
+            totalSalaries += employee.getSalary();
+        }
+        funds -= totalSalaries;
+        System.out.printf("Total salaries paid: $%.2f | Remaining funds: $%.2f%n", totalSalaries, funds);
+    }
+
+    //Getter for total businesses
+    public static int getTotalBusinesses() {
+        return totalBusinesses;
+    }
+
+    //Nested Employee class
+    class Employee {
+        private String name;
+        private String role;
+        private double salary;
+
+        public Employee(String name, String role, double salary) {
+            this.name = name;
+            this.role = role;
+            this.salary = salary;
+        }
+
+        //Getters for employee details
+        public String getName() {
+            return name;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public double getSalary() {
+            return salary;
+        }
+    }
+
+    //Getters for business details
+    public String getName() {
+        return name;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public double getFunds() {
+        return funds;
+    }
+
+    //Method to display business details
+    public void displayBusinessDetails() {
+        System.out.printf("Business: %s | Owner: %s | Funds: $%.2f%n", name, owner, funds);
+        System.out.println("Employees:");
+        for (Employee employee : employees) {
+            System.out.printf("- %s | Role: %s | Salary: $%.2f/hour%n", employee.getName(), employee.getRole(), employee.getSalary());
+        }
+    }
+}
+
+public class BloxburgGame {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<Business> businesses = new ArrayList<>();
+
+        System.out.println("Welcome to Bloxburg Business Simulator!");
+
+        while (true) {
+            System.out.println("\n--- Main Menu ---");
+            System.out.println("1. Create a new business");
+            System.out.println("2. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (choice == 1) {
+                System.out.println("\n--- Create Your Own Business ---");
+                System.out.print("Enter business name: ");
+                String name = scanner.nextLine();
+                System.out.print("Enter owner name: ");
+                String owner = scanner.nextLine();
+                System.out.print("Enter starting funds: ");
+                double funds = scanner.nextDouble();
+                scanner.nextLine();
+
+                Business userBusiness = new Business(name, owner, funds);
+
+                System.out.print("Enter number of employees to hire: ");
+                int numEmployees = scanner.nextInt();
+                scanner.nextLine();
+
+                for (int i = 0; i < numEmployees; i++) {
+                    System.out.printf("Enter employee %d name: ", i + 1);
+                    String empName = scanner.nextLine();
+                    System.out.printf("Enter employee %d role: ", i + 1);
+                    String empRole = scanner.nextLine();
+                    System.out.printf("Enter employee %d salary: ", i + 1);
+                    double empSalary = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    userBusiness.hireEmployee(empName, empRole, empSalary);
+                }
+
+                businesses.add(userBusiness);
+                System.out.println("\n--- Your Business Details ---");
+                userBusiness.displayBusinessDetails();
+                userBusiness.paySalaries();
+                userBusiness.payTaxes();
+
+                System.out.printf("%nTotal businesses created: %d%n", Business.getTotalBusinesses());
+            } else if (choice == 2) {
+                System.out.println("Exiting Bloxburg Business Simulator. Goodbye!");
+                break;
+            } else {
+                System.out.println("Invalid option. Please try again.");
+            }
+        }
+
+        scanner.close();
+    }
+}
